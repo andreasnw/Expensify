@@ -9,6 +9,7 @@ import type {CanvasSize, ContentSize, OnScaleChangedCallback, ZoomRange} from '@
 import {getCanvasFitScale} from '@components/MultiGestureCanvas/utils';
 import useStyleUtils from '@hooks/useStyleUtils';
 import NUMBER_OF_CONCURRENT_LIGHTBOXES from './numberOfConcurrentLightboxes';
+import RESIZE_MODES from '@components/Image/resizeModes';
 
 const DEFAULT_IMAGE_SIZE = 200;
 const DEFAULT_IMAGE_DIMENSION: ContentSize = {width: DEFAULT_IMAGE_SIZE, height: DEFAULT_IMAGE_SIZE};
@@ -196,6 +197,8 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
         [onScaleChangedContext, onScaleChangedProp],
     );
 
+    const zoomScale = Math.min((canvasSize?.width ?? 0) / (contentSize?.width ?? 0), (canvasSize?.height?? 0) / (contentSize?.height ?? 0));
+
     return (
         <View
             style={[StyleSheet.absoluteFill, style]}
@@ -225,6 +228,7 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
                                     onLoadEnd={() => {
                                         setLightboxImageLoaded(true);
                                     }}
+                                    resizeMode={zoomScale > 1 ? RESIZE_MODES.center : RESIZE_MODES.contain}
                                 />
                             </MultiGestureCanvas>
                         </View>

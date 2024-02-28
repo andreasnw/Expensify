@@ -12,10 +12,12 @@ import * as DeviceCapabilities from '@libs/DeviceCapabilities';
 import CONST from '@src/CONST';
 import viewRef from '@src/types/utils/viewRef';
 import type {ImageLoadNativeEventData, ImageViewProps} from './types';
+import Lightbox from '@components/Lightbox';
+import { DEFAULT_ZOOM_RANGE } from '@components/MultiGestureCanvas';
 
 type ZoomDelta = {offsetX: number; offsetY: number};
 
-function ImageView({isAuthTokenRequired = false, url, fileName, onError}: ImageViewProps) {
+function ImageView({isAuthTokenRequired = false, url, fileName, onError, style, zoomRange = DEFAULT_ZOOM_RANGE}: ImageViewProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const [isLoading, setIsLoading] = useState(true);
@@ -193,24 +195,13 @@ function ImageView({isAuthTokenRequired = false, url, fileName, onError}: ImageV
 
     if (canUseTouchScreen) {
         return (
-            <View
-                style={[styles.imageViewContainer, styles.overflowHidden]}
-                onLayout={onContainerLayoutChanged}
-            >
-                <Image
-                    source={{uri: url}}
-                    isAuthTokenRequired={isAuthTokenRequired}
-                    // Hide image until finished loading to prevent showing preview with wrong dimensions.
-                    style={isLoading || zoomScale === 0 ? undefined : [styles.w100, styles.h100]}
-                    // When Image dimensions are lower than the container boundary(zoomscale <= 1), use `contain` to render the image with natural dimensions.
-                    // Both `center` and `contain` keeps the image centered on both x and y axis.
-                    resizeMode={zoomScale > 1 ? RESIZE_MODES.center : RESIZE_MODES.contain}
-                    onLoadStart={imageLoadingStart}
-                    onLoad={imageLoad}
-                    onError={onError}
-                />
-                {(isLoading || zoomScale === 0) && <FullscreenLoadingIndicator style={[styles.opacity1, styles.bgTransparent]} />}
-            </View>
+            <Lightbox
+                uri={url}
+                zoomRange={zoomRange}
+                isAuthTokenRequired={isAuthTokenRequired}
+                onError={onError}
+                style={style}
+            />
         );
     }
     return (
